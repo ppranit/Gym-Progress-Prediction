@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymAI · Your 90-Day Prediction</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="result-page">
+
+  <!-- ░░ NAV ░░ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <span class="logo">
+        <span class="logo-icon">⚡</span>GymAI
+      </span>
+      <a href="/" class="btn-back">← New Prediction</a>
+    </div>
+  </nav>
+
+  <!-- ░░ RESULT HERO ░░ -->
+  <header class="result-hero">
+    <div class="hero-overlay dark"></div>
+    <div class="result-hero-content">
+      <div class="badge pulse">✅ Prediction Complete</div>
+      <h1>
+        {% if name %}{{ name }}'s{% else %}Your{% endif %}
+        <span class="accent">90-Day Forecast</span>
+      </h1>
+      <p>{{ gender }} &nbsp;·&nbsp; Age {{ age }} &nbsp;·&nbsp; {{ experience }}</p>
+    </div>
+  </header>
+
+  <!-- ░░ RESULTS ░░ -->
+  <main class="results-section">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+
+      <!-- Weight -->
+      <div class="kpi-card kpi-weight">
+        <div class="kpi-icon">⚖️</div>
+        <div class="kpi-label">Weight After 90 Days</div>
+        <div class="kpi-value">{{ weight_after }} <span class="kpi-unit">kg</span></div>
+        <div class="kpi-delta {% if weight_change_val < 0 %}delta-down{% elif weight_change_val > 0 %}delta-up{% else %}delta-neutral{% endif %}">
+          {{ weight_change }}
+        </div>
+        <div class="kpi-sub">from {{ initial_weight }} kg</div>
+        <div class="kpi-bar-wrap">
+          {% set weight_pct = [((weight_after / 150) * 100) | round | int, 100] | min %}
+          <div class="kpi-bar" style="width:{{ weight_pct }}%"></div>
+        </div>
+      </div>
+
+      <!-- Body Fat -->
+      <div class="kpi-card kpi-fat">
+        <div class="kpi-icon">🔥</div>
+        <div class="kpi-label">Body Fat After 90 Days</div>
+        <div class="kpi-value">{{ fat_after }} <span class="kpi-unit">%</span></div>
+        {% if fat_after < 15 %}
+          <div class="kpi-tag tag-elite">Athletic</div>
+        {% elif fat_after < 20 %}
+          <div class="kpi-tag tag-fit">Fit</div>
+        {% elif fat_after < 25 %}
+          <div class="kpi-tag tag-avg">Average</div>
+        {% else %}
+          <div class="kpi-tag tag-high">Above Avg</div>
+        {% endif %}
+        <div class="kpi-bar-wrap">
+          {% set fat_pct = [fat_after * 2, 100] | min | int %}
+          <div class="kpi-bar fat-bar" style="width:{{ fat_pct }}%"></div>
+        </div>
+      </div>
+
+      <!-- Goal Prob -->
+      <div class="kpi-card kpi-goal">
+        <div class="kpi-icon">🎯</div>
+        <div class="kpi-label">Goal Achievement Probability</div>
+        <div class="kpi-value">{{ goal_prob }} <span class="kpi-unit">%</span></div>
+        <div class="goal-badge {{ goal_color }}">{{ goal_label }} Probability</div>
+        <!-- Ring progress -->
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring-bg" cx="50" cy="50" r="38" />
+            {% set dashoffset = ((100 - goal_prob) / 100 * 238.76) | round(2) %}
+            <circle class="ring-fill {{ goal_color }}-ring"
+                    cx="50" cy="50" r="38"
+                    stroke-dasharray="238.76"
+                    stroke-dashoffset="{{ dashoffset }}" />
+            <text x="50" y="55" class="ring-text">{{ goal_prob }}%</text>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUMMARY BAR -->
+    <div class="summary-bar">
+      <div class="sum-item">
+        <span class="sum-label">Initial Weight</span>
+        <span class="sum-val">{{ initial_weight }} kg</span>
+      </div>
+      <div class="sum-arrow">→</div>
+      <div class="sum-item">
+        <span class="sum-label">Predicted Weight</span>
+        <span class="sum-val accent-text">{{ weight_after }} kg</span>
+      </div>
+      <div class="sum-divider"></div>
+      <div class="sum-item">
+        <span class="sum-label">Body Fat</span>
+        <span class="sum-val accent-text">{{ fat_after }}%</span>
+      </div>
+      <div class="sum-divider"></div>
+      <div class="sum-item">
+        <span class="sum-label">Goal Score</span>
+        <span class="sum-val accent-text">{{ goal_prob }}%</span>
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips-card">
+      <div class="tips-header">
+        <span class="tips-icon">💡</span>
+        <div>
+          <h2>Personalised AI Recommendations</h2>
+          <p>Based on your lifestyle profile</p>
+        </div>
+      </div>
+      <ul class="tips-list">
+        {% for tip in tips %}
+        <li class="tip-item">{{ tip }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- BODY FAT REFERENCE -->
+    <div class="reference-card">
+      <h2>📊 Body Fat Reference Ranges</h2>
+      <div class="ref-table">
+        <div class="ref-row header">
+          <span>Category</span><span>Men</span><span>Women</span>
+        </div>
+        <div class="ref-row {% if gender == 'Male' and fat_after < 6 or gender == 'Female' and fat_after < 14 %}highlight{% endif %}">
+          <span>Essential Fat</span><span>2–5%</span><span>10–13%</span>
+        </div>
+        <div class="ref-row {% if gender == 'Male' and fat_after >= 6 and fat_after < 14 or gender == 'Female' and fat_after >= 14 and fat_after < 21 %}highlight{% endif %}">
+          <span>Athletic</span><span>6–13%</span><span>14–20%</span>
+        </div>
+        <div class="ref-row {% if gender == 'Male' and fat_after >= 14 and fat_after < 18 or gender == 'Female' and fat_after >= 21 and fat_after < 25 %}highlight{% endif %}">
+          <span>Fitness</span><span>14–17%</span><span>21–24%</span>
+        </div>
+        <div class="ref-row {% if gender == 'Male' and fat_after >= 18 and fat_after < 25 or gender == 'Female' and fat_after >= 25 and fat_after < 32 %}highlight{% endif %}">
+          <span>Average</span><span>18–24%</span><span>25–31%</span>
+        </div>
+        <div class="ref-row {% if gender == 'Male' and fat_after >= 25 or gender == 'Female' and fat_after >= 32 %}highlight{% endif %}">
+          <span>Obese</span><span>25%+</span><span>32%+</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="action-row">
+      <a href="/" class="btn-predict">
+        <span class="btn-icon">⚡</span>Try Another Prediction
+      </a>
+    </div>
+
+  </main>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <p>GymAI &nbsp;·&nbsp; Gradient Boosting ML &nbsp;·&nbsp; 30,000-record dataset &nbsp;·&nbsp; AUC 0.95</p>
+    <p class="footer-note">Predictions are AI estimates. Consult a certified trainer for personalised plans.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymAI · 90-Day Progress Predictor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ░░ NAV ░░ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <span class="logo">
+        <span class="logo-icon">⚡</span>GymAI
+      </span>
+      <span class="nav-tagline">Powered by Machine Learning</span>
+    </div>
+  </nav>
+
+  <!-- ░░ HERO ░░ -->
+  <header class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="badge">90-Day AI Prediction Engine</div>
+      <h1>Predict Your <span class="accent">Transformation</span></h1>
+      <p>Enter your stats below and our Gradient Boosting ML model will predict your
+         Weight, Body Fat &amp; Goal Achievement after 90 days of training.</p>
+      <div class="hero-stats">
+        <div class="stat-chip">🎯 <strong>87.6%</strong> Accuracy</div>
+        <div class="stat-chip">📊 <strong>30,000</strong> Athletes</div>
+        <div class="stat-chip">🔬 <strong>R² 0.989</strong> Precision</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ░░ FORM ░░ -->
+  <main class="form-section">
+
+    {% if error %}
+    <div class="alert-error">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form action="/predict" method="POST" class="predict-form" novalidate>
+
+      <!-- SECTION 1 – Personal -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="card-icon">👤</span>
+          <div>
+            <h2>Personal Details</h2>
+            <p>Basic information about you</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field-group">
+            <label for="name">Your Name</label>
+            <input id="name" name="name" type="text"
+                   placeholder="e.g. Alex Rodriguez" />
+          </div>
+
+          <div class="field-group">
+            <label for="age">Age <span class="unit">(years)</span></label>
+            <input id="age" name="age" type="number"
+                   min="16" max="80" step="1"
+                   placeholder="e.g. 28" required />
+          </div>
+
+          <div class="field-group">
+            <label for="gender">Gender</label>
+            <div class="select-wrapper">
+              <select id="gender" name="gender" required>
+                <option value="">— Select —</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="height">Height <span class="unit">(cm)</span></label>
+            <input id="height" name="height" type="number"
+                   min="140" max="220" step="0.1"
+                   placeholder="e.g. 175" required />
+          </div>
+
+          <div class="field-group">
+            <label for="initial_weight">Current Weight <span class="unit">(kg)</span></label>
+            <input id="initial_weight" name="initial_weight" type="number"
+                   min="30" max="200" step="0.1"
+                   placeholder="e.g. 82.5" required />
+          </div>
+
+          <div class="field-group">
+            <label for="training_experience">Training Experience</label>
+            <div class="select-wrapper">
+              <select id="training_experience" name="training_experience" required>
+                <option value="">— Select —</option>
+                <option value="Beginner">Beginner (&lt; 1 year)</option>
+                <option value="Intermediate">Intermediate (1–3 years)</option>
+                <option value="Advanced">Advanced (3+ years)</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 2 – Workout -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="card-icon">🏋️</span>
+          <div>
+            <h2>Workout Profile</h2>
+            <p>Your weekly training breakdown</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field-group">
+            <label for="workout_days">Workout Days <span class="unit">/week</span></label>
+            <input id="workout_days" name="workout_days" type="number"
+                   min="1" max="7" step="1"
+                   placeholder="e.g. 4" required />
+          </div>
+
+          <div class="field-group">
+            <label for="workout_duration">Session Duration <span class="unit">(min)</span></label>
+            <input id="workout_duration" name="workout_duration" type="number"
+                   min="15" max="240" step="1"
+                   placeholder="e.g. 60" required />
+          </div>
+
+          <div class="field-group">
+            <label for="cardio_minutes">Cardio per Session <span class="unit">(min)</span></label>
+            <input id="cardio_minutes" name="cardio_minutes" type="number"
+                   min="0" max="180" step="1"
+                   placeholder="e.g. 20" required />
+          </div>
+
+          <div class="field-group">
+            <label for="strength_minutes">Strength per Session <span class="unit">(min)</span></label>
+            <input id="strength_minutes" name="strength_minutes" type="number"
+                   min="0" max="180" step="1"
+                   placeholder="e.g. 40" required />
+          </div>
+
+          <div class="field-group">
+            <label for="daily_steps">Daily Steps</label>
+            <input id="daily_steps" name="daily_steps" type="number"
+                   min="1000" max="30000" step="100"
+                   placeholder="e.g. 8000" required />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 3 – Nutrition -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="card-icon">🥗</span>
+          <div>
+            <h2>Nutrition &amp; Hydration</h2>
+            <p>Daily dietary habits</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field-group">
+            <label for="daily_calories">Daily Calories <span class="unit">(kcal)</span></label>
+            <input id="daily_calories" name="daily_calories" type="number"
+                   min="1000" max="6000" step="50"
+                   placeholder="e.g. 2200" required />
+          </div>
+
+          <div class="field-group">
+            <label for="protein_intake">Protein Intake <span class="unit">(g)</span></label>
+            <input id="protein_intake" name="protein_intake" type="number"
+                   min="30" max="400" step="1"
+                   placeholder="e.g. 150" required />
+          </div>
+
+          <div class="field-group">
+            <label for="water_intake">Water Intake <span class="unit">(litres)</span></label>
+            <input id="water_intake" name="water_intake" type="number"
+                   min="0.5" max="10" step="0.1"
+                   placeholder="e.g. 3.0" required />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 4 – Lifestyle -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="card-icon">🌙</span>
+          <div>
+            <h2>Lifestyle Factors</h2>
+            <p>Recovery and mental wellbeing</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field-group">
+            <label for="sleep_hours">Sleep Duration <span class="unit">(hrs)</span></label>
+            <input id="sleep_hours" name="sleep_hours" type="number"
+                   min="3" max="12" step="0.5"
+                   placeholder="e.g. 7.5" required />
+          </div>
+
+          <div class="field-group">
+            <label for="stress_level">Stress Level <span class="unit">(1 = low, 10 = high)</span></label>
+            <input id="stress_level" name="stress_level" type="number"
+                   min="1" max="10" step="1"
+                   placeholder="e.g. 4" required />
+            <div class="stress-scale">
+              <span>😌 Calm</span>
+              <span class="bars">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+              </span>
+              <span>😫 Burnout</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="submit-row">
+        <button type="submit" class="btn-predict">
+          <span class="btn-icon">⚡</span>
+          Predict My 90-Day Progress
+        </button>
+        <p class="disclaimer">Your data is used only for prediction. Nothing is stored.</p>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <p>GymAI &nbsp;·&nbsp; Gradient Boosting ML &nbsp;·&nbsp; R² 0.989 &nbsp;·&nbsp; AUC 0.95</p>
+  </footer>
+
+</body>
+</html>
